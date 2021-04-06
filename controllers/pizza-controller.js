@@ -6,6 +6,12 @@ const pizzaController = {
   // get all pizzas
   getAllPizza: function (req, res) {
     Pizza.find({})
+      .populate({
+        path: "comments", // populates the value of required field, in this case, comments
+        select: "-__v", // we don't care about the __v field on comments. The minus '-' sign in front of it indicates that we don't  want it to be returned. If we didn't have it, it would mean that it would return only the __v field
+      })
+      .select("-__v") // since we're doing that for our populated comments, let's update the query to not include the pizza's __v field either, as it just adds more noise to out returning data.
+      .sort({ _id: -1 }) // sorts the data in DESC order by the _id value
       .then((dbPizzaData) => res.json(dbPizzaData))
       .catch((err) => {
         console.log(err);
@@ -17,6 +23,12 @@ const pizzaController = {
   getPizzaById({ params }, res) {
     // Instead of accessing the entire req, we've destructured params out of it, because that's the only data we need for this request to be fulfilled
     Pizza.findOne({ _id: params.id })
+      .populate({
+        path: "comments",
+        select: "-__v",
+      })
+      .select("-__v")
+      // we don't need the .sort() method here b/c we'd only be sorting a single pizza
       .then((dbPizzaData) => {
         // If no pizza found, send 404
         if (!dbPizzaData) {
