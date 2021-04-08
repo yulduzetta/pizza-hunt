@@ -49,6 +49,10 @@ const PizzaSchema = new Schema(
     toJSON: {
       // we need to tell the schema that it can use virtuals.
       virtuals: true,
+
+      // Getters let you transform data in MongoDB into a more user friendly form, and setters let you transform user data before it gets to MongoDB.
+      // getters DO NOT impact the underlying data stored in MongoDB
+      // https://mongoosejs.com/docs/tutorials/getters-setters.html
       getters: true,
     },
     id: false, //We set id to false because this is a virtual that Mongoose returns, and we don’t need it.
@@ -62,7 +66,16 @@ const PizzaSchema = new Schema(
 
 // get total count of comments and replies on retrieval
 PizzaSchema.virtual("commentCount").get(function () {
-  return this.comments.length;
+  // Here we're using the .reduce() method to tally up the total of every comment with its replies.
+  // In its basic form, .reduce() takes two parameters, an accumulator and a currentValue.
+  // Here, the accumulator is total, and the currentValue is comment.
+  // As .reduce() walks through the array, it passes the accumulating total
+  // and the current value of comment into the function, with the return
+  // of the function revising the total for the next iteration through the array.
+  return this.comments.reduce(
+    (total, comment) => total + comment.replies.length + 1,
+    0
+  );
 });
 
 // Now we need to actually create the model to get the prebuilt
