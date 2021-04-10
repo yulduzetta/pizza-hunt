@@ -15,9 +15,13 @@ const PizzaSchema = new Schema(
   {
     pizzaName: {
       type: String,
+      required: "You need to provide a pizza name",
+      trim: true, // removes leading and trailing spaces in the input
     },
     createdBy: {
       type: String,
+      required: "You need to provide author name",
+      trim: true, // removes leading and trailing spaces in the input
     },
     createdAt: {
       type: Date,
@@ -35,7 +39,17 @@ const PizzaSchema = new Schema(
     },
     size: {
       type: String,
-      default: "Large",
+      // With this validation option in place, we provide an array of options
+      // that this size field will accept. If a user attempts to enter a pizza size not listed—for example,
+      // a size value of "Super Mega Large"—the validation simply won't allow it.
+      enum: ["Personal", "Small", "Medium", "Large", "Extra Large"],
+
+      // If you were to provide a custom error message for the required option here,
+      // you wouldn't receive it if you provide a size that isn't listed in the enum option.
+      // If you want to provide a custom message for enumerable values,
+      // you need to look into implementing the validate option Mongoose lets you use,
+      // where you can create a custom function to test the values, just like you did with Inquirer!
+      required: true,
     },
     toppings: [], // can also use Array
     comments: [

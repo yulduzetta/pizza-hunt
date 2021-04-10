@@ -71,7 +71,17 @@ const pizzaController = {
 
   // update pizza by id
   updatePizza({ params, body }, res) {
-    Pizza.findOneAndUpdate({ _id: params.id }, body, { new: true }) //If we don't set that third parameter, { new: true }, it will return the original document. By setting the parameter to true, we're instructing Mongoose to return the new version of the document.
+    Pizza.findOneAndUpdate({ _id: params.id }, body, {
+      //If we don't set that third parameter, { new: true }, it will return the original document.
+      // By setting the parameter to true, we're instructing Mongoose to return the new version of the document.
+      new: true,
+
+      // Mongoose only executes the validators automatically when we actually create new data.
+      // This means that a user can create a pizza, but then update that pizza with totally different data
+      // and not have it validated. We need to include {runValidators: true} explicit setting when
+      // updating data so that it knows to validate any new information.
+      runValidators: true,
+    })
       .then((dbPizzaData) => {
         if (!dbPizzaData) {
           res.status(404).json({ message: "No pizza found with this id" });
